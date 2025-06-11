@@ -23,7 +23,8 @@ public class Main {
             directoryPath = Path.of(sc.nextLine());
         }
 
-        Path transactionPath = directoryPath.resolve("transaction_by_users");
+        Path rootDirectoryPath = directoryPath.getParent();
+        Path transactionPath = rootDirectoryPath.resolve("transaction_by_users");
         Files.createDirectories(transactionPath);
 
         List<Path> paths = new ArrayList<>();
