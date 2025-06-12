@@ -12,19 +12,20 @@ import java.util.stream.Collectors;
 public class Main {
     public static void main(String[] args) throws IOException {
         Scanner sc = new Scanner(System.in);
-        System.out.println("Введите абсолютный путь директории или exit, если хотите выйти: ");
+        System.out.println("Enter the absolute path of the directory or exit if you want to exit: ");
         Path directoryPath = Path.of(sc.nextLine());
 
         while (!(Files.isDirectory(directoryPath) && directoryPath.isAbsolute())) {
             if (directoryPath.toString().equals("exit")) {
                 return;
             }
-            System.out.println("Вы ввели неверный путь. Введите его заново или exit, если хотите выйти: ");
+            System.out.println("You entered an invalid path. Enter it again or exit if you want to exit: ");
             directoryPath = Path.of(sc.nextLine());
         }
 
         Path rootDirectoryPath = directoryPath.getParent();
         Path transactionPath = rootDirectoryPath.resolve("transaction_by_users");
+        clearTransactionDirectory(transactionPath);
         Files.createDirectories(transactionPath);
 
         List<Path> paths = new ArrayList<>();
@@ -50,17 +51,17 @@ public class Main {
         Map<String, List<String>> userLogs = new HashMap<>();
         for (Path path : paths) {
             try (BufferedReader reader = Files.newBufferedReader(path)) {
-                String textUser1;
-                while ((textUser1 = reader.readLine()) != null) {
-                    String user1 = getUser(textUser1, 1);
-                    if (textUser1.contains(OperationType.TRANSFERRED.getOperation())) {
-                        String user2 = getUser(textUser1, 2);
-                        double money = getMoney(textUser1, OperationType.TRANSFERRED);
-                        String time = getTime(textUser1);
-                        String textUser2 = time + " " + user2 + " received " + money + " from " + user1;
-                        userLogs.computeIfAbsent(user2, _ -> new ArrayList<>()).add(textUser2);
+                String logUser1;
+                while ((logUser1 = reader.readLine()) != null) {
+                    String user1 = getUser(logUser1, 1);
+                    if (logUser1.contains(OperationType.TRANSFERRED.getOperation())) {
+                        String user2 = getUser(logUser1, 2);
+                        double money = getMoney(logUser1, OperationType.TRANSFERRED);
+                        String time = getTime(logUser1);
+                        String logUser2 = createLog(time, user1, user2, money);
+                        userLogs.computeIfAbsent(user2, _ -> new ArrayList<>()).add(logUser2);
                     }
-                    userLogs.computeIfAbsent(user1, _ -> new ArrayList<>()).add(textUser1);
+                    userLogs.computeIfAbsent(user1, _ -> new ArrayList<>()).add(logUser1);
                 }
             }
         }
@@ -68,21 +69,33 @@ public class Main {
     }
 
     private static String createFinalBalance(String user, List<String> userLogs) {
-        double balance = 0;
-        int indexLastBalance = 0;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss]");
-        String time = "[" + formatter.format(ZonedDateTime.now(ZoneId.systemDefault())) + "]";
+        double balance;
+        int indexLastBalance;
+        String time = createTimeNow();
 
-        Optional<String> lastBalanceOp = userLogs.stream().filter(s -> s.contains(OperationType.INQUIRY.getOperation())).reduce((_, b) -> b);
+        List<String> inquiryBalanceList = userLogs.stream().filter(s -> s.contains(OperationType.INQUIRY.getOperation())).collect(Collectors.toList());
 
-        if (!lastBalanceOp.isEmpty()) {
-            String lastBalance = lastBalanceOp.get();
-            balance = getMoney(lastBalance, OperationType.INQUIRY);
-            indexLastBalance = userLogs.indexOf(lastBalance);
+        if (inquiryBalanceList.size() <= 0) {
+            return createLog(time, user, OperationType.ERROR_NO_INQUIRY_BALANCE);
         }
+        else if (inquiryBalanceList.size() == 1) {
+            indexLastBalance = userLogs.indexOf(inquiryBalanceList.get(inquiryBalanceList.size() - 1));
+        }
+        else {
+            indexLastBalance = userLogs.indexOf(inquiryBalanceList.get(0));
+        }
+
+        balance = getMoney(userLogs.get(indexLastBalance), OperationType.INQUIRY);
+
 
         for (int i = indexLastBalance; i < userLogs.size(); i++) {
             double moneyOperation;
+            if (userLogs.get(i).contains(OperationType.INQUIRY.getOperation())) {
+                if (Math.abs(balance - getMoney(userLogs.get(i), OperationType.INQUIRY)) > 0.000001) {
+                    return createLog(time, user, OperationType.ERROR_NO_EQUALS_BALANCE_AND_INQUIRY_BALANCE);
+                }
+            }
+
             if (userLogs.get(i).contains(OperationType.TRANSFERRED.getOperation())) {
                 moneyOperation = getMoney(userLogs.get(i), OperationType.TRANSFERRED);
                 balance -= moneyOperation;
@@ -95,7 +108,7 @@ public class Main {
             }
         }
 
-        return time + " " + user + " final balance " + balance;
+        return createLog(time, user, balance);
     }
 
     private static double getMoney(String line, OperationType operation) {
@@ -160,5 +173,42 @@ public class Main {
         int indexLast = line.indexOf(']') + 1;
         time = line.substring(indexFirst, indexLast);
         return time;
+    }
+
+    private static String createLog(String time, String user1, String user2, double money) {
+        return time + " " + user2 + " " + OperationType.RECEIVED.getOperation() + " " + money + " from " + user1;
+    }
+
+    private static String createLog(String time, String user1, double balance) {
+        return time + " " + user1 + " " + OperationType.FINAL_BALANCE.getOperation() + " " + balance;
+    }
+
+    private static String createLog(String time, String user1, OperationType operation) {
+        if (operation == OperationType.ERROR_NO_INQUIRY_BALANCE) {
+            return time + " " + user1 + " does not have a balance inquiry operation to find out the exact balance";
+        }
+        else {
+            return time + " " + user1 + " current balance does not match the inquiry balance";
+        }
+    }
+    
+    private static String createTimeNow() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss]");
+        String time = "[" + formatter.format(ZonedDateTime.now(ZoneId.systemDefault())) + "]";
+        return time;
+    }
+
+    private static void clearTransactionDirectory(Path transactionPath) throws IOException {
+        if (Files.exists(transactionPath) && Files.isDirectory(transactionPath)) {
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(transactionPath)) {
+                for (Path file : stream) {
+                    try {
+                        Files.delete(file);
+                    } catch (IOException e) {
+                        System.err.println("Failed to delete file: " + file + " - " + e.getMessage());
+                    }
+                }
+            }
+        }
     }
 }

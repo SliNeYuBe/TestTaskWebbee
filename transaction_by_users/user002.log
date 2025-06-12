@@ -7,4 +7,4 @@
 [2025-05-10 23:45:32] user002 received 150.0 from user003
 [2025-05-10 23:55:32] user002 withdrew 50
 [2025-05-11 10:00:31] user002 balance inquiry 210.00
-[2025-06-12 02:20:42] user002 final balance 210.0
+[2025-06-12 17:34:42] user002 current balance does not match the inquiry balance
