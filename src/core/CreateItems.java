@@ -52,15 +52,15 @@ public class CreateItems {
         return createLog(time, user, balance);
     }
 
-    static String createLog(String time, String user1, String user2, double money) {
+    static String createLog(String time, String user1, String user2, double money) { //Создает строчку с определенным действием юзера
         return time + " " + user2 + " " + OperationType.RECEIVED.getOperation() + " " + money + " from " + user1;
     }
 
-    static String createLog(String time, String user1, double balance) {
+    static String createLog(String time, String user1, double balance) { //Перегрузка создание лога
         return time + " " + user1 + " " + OperationType.FINAL_BALANCE.getOperation() + " " + balance;
     }
 
-    static String createLog(String time, String user1, OperationType operation) {
+    static String createLog(String time, String user1, OperationType operation) { //Перегрузка создание лога
         if (operation == OperationType.ERROR_NO_INQUIRY_BALANCE) {
             return time + " " + user1 + " does not have a balance inquiry operation to find out the exact balance";
         }
@@ -69,7 +69,7 @@ public class CreateItems {
         }
     }
 
-    static String createTimeNow() {
+    static String createTimeNow() { //Создает текущую дату и время для лога
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss]");
         String time = "[" + formatter.format(ZonedDateTime.now(ZoneId.systemDefault())) + "]";
         return time;

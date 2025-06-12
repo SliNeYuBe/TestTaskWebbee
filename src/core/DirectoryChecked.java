@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class DirectoryChecked {
-    static boolean checkedDirectory(Path transactionPath) throws IOException {
+    static boolean checkedDirectory(Path transactionPath) throws IOException { //Проверяет, есть ли в папке логи
         if (Files.exists(transactionPath) && Files.isDirectory(transactionPath)) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(transactionPath)) {
                 for (Path file : stream) {

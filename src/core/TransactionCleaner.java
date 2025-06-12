@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class TransactionCleaner {
-    static void clearTransactionDirectory(Path transactionPath) throws IOException {
+    static void clearTransactionDirectory(Path transactionPath) throws IOException { //Пересоздает логи пользователей и заполняет их заново
         if (Files.exists(transactionPath) && Files.isDirectory(transactionPath)) {
             try (DirectoryStream<Path> stream = Files.newDirectoryStream(transactionPath)) {
                 for (Path file : stream) {

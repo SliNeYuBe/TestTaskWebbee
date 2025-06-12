@@ -1,7 +1,7 @@
 package core;
 
 public class GetItems {
-    static double getMoney(String line, OperationType operation) {
+    static double getMoney(String line, OperationType operation) { //Вытаскивает количество денег из лога
         String money = null;
         int indexFirst;
         int indexLast;
@@ -36,7 +36,7 @@ public class GetItems {
         return Double.parseDouble(money);
     }
 
-    static String getUser(String line, int userNum) {
+    static String getUser(String line, int userNum) { //Вытаскивает конкретного юзера из лога
         String user = null;
         int indexFirst;
         int indexLast;
@@ -57,7 +57,7 @@ public class GetItems {
         return user;
     }
 
-    static String getTime(String line) {
+    static String getTime(String line) { //Вытаскивает время из лога
         String time;
         int indexFirst = 0;
         int indexLast = line.indexOf(']') + 1;

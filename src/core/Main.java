@@ -6,7 +6,7 @@ import java.nio.file.Path;
 import static core.WriteLogs.writeLogs;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException { //Зацикливает программу. Можно завершить, если ввести "exit"
         CreatePaths paths;
         boolean flag;
         while (true) {

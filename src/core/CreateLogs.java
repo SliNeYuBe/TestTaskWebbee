@@ -13,7 +13,7 @@ import static core.CreateItems.*;
 import static core.GetItems.*;
 
 public class CreateLogs {
-    static Map<String, List<String>> createLogs(List<Path> paths) throws IOException {
+    static Map<String, List<String>> createLogs(List<Path> paths) throws IOException { //Заполняет словарь, где ключ - определенный юзер, значение - любые строчки, где он упоминается
         Map<String, List<String>> userLogs = new HashMap<>();
         for (Path path : paths) {
             try (BufferedReader reader = Files.newBufferedReader(path)) {

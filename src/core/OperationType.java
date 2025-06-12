@@ -1,6 +1,6 @@
 package core;
 
-public enum OperationType {
+public enum OperationType { //Класс Enum, который содержит операции с деньгами
     INQUIRY("inquiry"),
     TRANSFERRED("transferred"),
     RECEIVED("received"),

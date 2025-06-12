@@ -17,19 +17,19 @@ import static core.CreateLogs.createLogs;
 public class WriteLogs {
     static void writeLogs(Path directoryPath, Path transactionPath) throws IOException {
 
-        clearTransactionDirectory(transactionPath);
+        clearTransactionDirectory(transactionPath); //Пересоздает логи пользователей
         Files.createDirectories(transactionPath);
 
-        List<Path> paths = new ArrayList<>();
+        List<Path> paths = new ArrayList<>(); //Создает лист с путями к заданным логам
         try (DirectoryStream<Path> files = Files.newDirectoryStream(directoryPath)) {
             for (Path path : files) {
-                if (Files.isRegularFile(path)) paths.add(path);
+                if (Files.isRegularFile(path) && path.getFileName().toString().endsWith(".log")) paths.add(path);
             }
         }
 
         Map<String, List<String>> userLogs = createLogs(paths);
 
-        for (Map.Entry<String, List<String>> entry : userLogs.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : userLogs.entrySet()) { //Создает лог файл с именем юзера и заполняет все операции, которые он сделал
             String key = entry.getKey();
             List<String> value = entry.getValue().stream().sorted().collect(Collectors.toList());
             value.add(createFinalBalance(key, value));

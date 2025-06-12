@@ -23,8 +23,8 @@ public class CreatePaths {
         return flag;
     }
 
-    private CreatePaths() throws IOException {
-        Scanner sc = new Scanner(System.in);
+    private CreatePaths() throws IOException { //Создает пути к директориям с заданными логами и логами на каждого юзера.
+        Scanner sc = new Scanner(System.in);    //Если что-то не так, отправляет комментарий, что нужно исправить
         System.out.println("Enter the absolute path of the directory or \"exit\" if you want to exit: ");
         directoryPath = Path.of(sc.nextLine());
 
@@ -36,7 +36,7 @@ public class CreatePaths {
                 return;
             }
             if (!(Files.isDirectory(directoryPath) && directoryPath.isAbsolute())) {
-                System.out.println("You entered an invalid path. Enter it again or \"exit\" if you want to exit: ");
+                System.out.println("You entered an invalid path. Enter the path again or \"exit\" if you want to exit: ");
             }
             else if (!checkedDirectory(directoryPath)) {
                 System.out.println("There are no log files in this directory. Enter the path again or \"exit\" if you want to exit: ");
