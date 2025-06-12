@@ -45,7 +45,7 @@ public class CreatePaths {
         }
 
         Path rootDirectoryPath = directoryPath.getParent();
-        transactionPath = rootDirectoryPath.resolve("transaction_by_users");
+        transactionPath = rootDirectoryPath.resolve("transactions_by_users");
         flag = true;
     }
 
