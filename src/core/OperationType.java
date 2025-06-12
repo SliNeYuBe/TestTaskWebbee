@@ -1,4 +1,4 @@
-package main;
+package core;
 
 public enum OperationType {
     INQUIRY("inquiry"),
